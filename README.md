@@ -60,7 +60,7 @@ php artisan route:list --compact
 +----------+---------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------+
 ```
 
-Update the config file in config/vendor/arpanext/swagger/schemas/index.php:
+Update the config file in config/vendor/arpanext/swagger/schemas/api/schemas.php:
 
 ```php
 return [
