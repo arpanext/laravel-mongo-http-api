@@ -11,7 +11,7 @@ class FindOneTest extends TestCase
      */
     public function testOK()
     {
-        $response = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertOne', [
+        $insertOneResponse = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertOne', [
             "id" => 1,
             "name" => "Leanne Graham",
             "username" => "Bret",
@@ -35,12 +35,16 @@ class FindOneTest extends TestCase
             ]
         ]);
 
-        $response = $this->get('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/findOne?' . http_build_query([
+        $findOneResponse = $this->get('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/findOne?' . http_build_query([
             'filter' => '{"id":1,"name":"Leanne Graham","email":"Sincere@april.biz"}',
             'options' => '{"sort":{"_id":-1}}',
         ]));
 
-        $response->assertStatus(200);
+        $findOneResponse->assertStatus(200);
+
+        $response = $this->delete('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/deleteOne?' . http_build_query([
+            'filter' => '{"_id":{"$oid":"' . $insertOneResponse->json()['insertedId']['$oid'] . '"}}',
+        ]));
     }
 
     public function testNotFound()

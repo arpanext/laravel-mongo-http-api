@@ -13,7 +13,7 @@ class InsertOneTest extends TestCase
      */
     public function testCreated()
     {
-        $response = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertOne', [
+        $insertOneResponse = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertOne', [
             "id" => 1,
             "name" => "Leanne Graham",
             "username" => "Bret",
@@ -37,6 +37,10 @@ class InsertOneTest extends TestCase
             ]
         ]);
 
-        $response->assertStatus(201);
+        $insertOneResponse->assertStatus(201);
+
+        $response = $this->delete('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/deleteOne?' . http_build_query([
+            'filter' => '{"_id":{"$oid":"' . $insertOneResponse->json()['insertedId']['$oid'] . '"}}',
+        ]));
     }
 }

@@ -13,7 +13,7 @@ class InsertManyTest extends TestCase
      */
     public function testCreated()
     {
-        $response = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertMany', [
+        $insertManyResponse = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertMany', [
             [
                 "id" => 1,
                 "name" => "Leanne Graham",
@@ -62,6 +62,14 @@ class InsertManyTest extends TestCase
             ]
         ]);
 
-        $response->assertStatus(201);
+        $insertManyResponse->assertStatus(201);
+
+        foreach ($insertManyResponse->json()['insertedIds'] as $insertedId) {
+
+            $response = $this->delete('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/deleteOne?' . http_build_query([
+                'filter' => '{"_id":{"$oid":"' . $insertedId['$oid'] . '"}}',
+            ]));
+
+        }
     }
 }

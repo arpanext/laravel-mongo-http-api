@@ -13,7 +13,7 @@ class FindManyTest extends TestCase
      */
     public function testOK()
     {
-        $response = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertMany', [
+        $insertManyResponse = $this->json('POST', 'http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/insertMany', [
             [
                 "id" => 1,
                 "name" => "Leanne Graham",
@@ -62,11 +62,17 @@ class FindManyTest extends TestCase
             ]
         ]);
 
-        $response = $this->get('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/findMany?' . http_build_query([
+        $findManyResponse = $this->get('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/findMany?' . http_build_query([
             'filter' => '{ "$or": [ { "name": "Leanne Graham" }, { "name": "Ervin Howell" } ] }',
             'options' => '{"sort":{"_id":-1}}',
         ]));
 
-        $response->assertStatus(200);
+        $findManyResponse->assertStatus(200);
+
+        foreach ($insertManyResponse->json()['insertedIds'] as $insertedId) {
+            $response = $this->delete('http://127.0.0.1:8000/api/v1/mongo/shell/databases/database/collections/collection/deleteOne?' . http_build_query([
+                'filter' => '{"_id":{"$oid":"' . $insertedId['$oid'] . '"}}',
+            ]));
+        }
     }
 }
